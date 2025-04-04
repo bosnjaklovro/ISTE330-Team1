@@ -6,7 +6,6 @@ public class HealthMetricDAO {
     public HealthMetricDAO(MySQLDatabase db) {
         this.db = db;
     }
-
     public boolean create(int memberId, Date recordDate, double weight, double height, double bodyFat,
             String bloodPressure) {
         String sql = "INSERT INTO HealthMetric (MemberID, RecordDate, Weight, Height, BodyFat, BloodPressure) VALUES (?, ?, ?, ?, ?, ?)";
