@@ -1,3 +1,5 @@
+package src;
+
 public class GymApp {
     public static void main(String[] args) {
         MySQLDatabase db = new MySQLDatabase();
