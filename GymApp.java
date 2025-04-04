@@ -8,6 +8,7 @@ public class GymApp {
             //test query
             db.getData("SELECT * FROM User");
 
+
             db.close();
         } else {
             System.out.println("Failed to connect to database.");
