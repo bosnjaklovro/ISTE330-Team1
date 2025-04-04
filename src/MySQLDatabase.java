@@ -1,11 +1,13 @@
+package src;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -18,6 +20,10 @@ public class MySQLDatabase {
     public MySQLDatabase() {
         loadConfig();
         readPasswordFromConsole();
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 
     private void loadConfig() {
@@ -49,7 +55,7 @@ public class MySQLDatabase {
 
     public boolean close() {
         try {
-            if (connection != null) {
+            if (connection != null && !connection.isClosed()) {
                 connection.close();
                 return true;
             }
@@ -59,50 +65,45 @@ public class MySQLDatabase {
         return false;
     }
 
-    public void getData(String sql) {
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            ResultSetMetaData meta = rs.getMetaData();
-            int cols = meta.getColumnCount();
-
-            // Print column headers
-            for (int i = 1; i <= cols; i++) {
-                System.out.print(meta.getColumnName(i) + "\t");
+    // Updated getData with parameter support
+    public void getData(String sql, Object... params) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) {
+                pstmt.setObject(i + 1, params[i]);
             }
-            System.out.println();
 
-            // Print data rows
-            while (rs.next()) {
+            try (ResultSet rs = pstmt.executeQuery()) {
+                ResultSetMetaData meta = rs.getMetaData();
+                int cols = meta.getColumnCount();
+
+                // Print headers
                 for (int i = 1; i <= cols; i++) {
-                    System.out.print(rs.getString(i) + "\t");
+                    System.out.print(meta.getColumnName(i) + "\t");
                 }
                 System.out.println();
+
+                // Print rows
+                while (rs.next()) {
+                    for (int i = 1; i <= cols; i++) {
+                        System.out.print(rs.getString(i) + "\t");
+                    }
+                    System.out.println();
+                }
             }
         } catch (SQLException e) {
             System.out.println("Query error: " + e.getMessage());
         }
     }
 
-    public boolean setData(String sql) {
-        try (Statement stmt = connection.createStatement()) {
-            int rowsAffected = stmt.executeUpdate(sql);
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            System.out.println("Query error: " + e.getMessage());
-            return false;
-        }
-    }
-
-    public int getLastInsertId() {
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT LAST_INSERT_ID()")) {
-            if (rs.next()) {
-                return rs.getInt(1);
+    // Varargs executeUpdate method
+    public int executeUpdate(String sql, Object... params) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) {
+                pstmt.setObject(i + 1, params[i]);
             }
-            return -1;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error getting last insert ID: " + e.getMessage());
+            System.out.println("Execute update error: " + e.getMessage());
             return -1;
         }
     }
