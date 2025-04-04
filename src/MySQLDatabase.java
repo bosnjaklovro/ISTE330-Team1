@@ -22,6 +22,10 @@ public class MySQLDatabase {
         readPasswordFromConsole();
     }
 
+    public Connection getConnection() {
+        return connection;
+    }
+
     private void loadConfig() {
         Properties props = new Properties();
         try (FileInputStream fis = new FileInputStream("config.properties")) {
