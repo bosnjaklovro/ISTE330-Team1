@@ -88,7 +88,7 @@ CREATE TABLE Membership (
     FOREIGN KEY (PlanID) REFERENCES MembershipPlan(PlanID)
 );
 
--- 7. Class Table
+-- 7. Class Table -- mine
 CREATE TABLE Class (
     ClassID INT PRIMARY KEY AUTO_INCREMENT,
     ClassName VARCHAR(100),
@@ -97,7 +97,7 @@ CREATE TABLE Class (
     Duration INT
 );
 
--- 8. Schedule Table
+-- 8. Schedule Table -- mine
 CREATE TABLE Schedule (
     ScheduleID INT PRIMARY KEY AUTO_INCREMENT,
     ClassID INT,
@@ -109,7 +109,7 @@ CREATE TABLE Schedule (
     FOREIGN KEY (TrainerID) REFERENCES Trainer(TrainerID)
 );
 
--- 9. Booking Table
+-- 9. Booking Table -- mine
 CREATE TABLE Booking (
     BookingID INT PRIMARY KEY AUTO_INCREMENT,
     MemberID INT,
